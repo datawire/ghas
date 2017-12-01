@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ build.name }}
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: ghas_mapping
+      prefix: /
+      service: {{ build.name }}
+spec:
+  selector:
+    app: {{ build.name }}
+  ports:
+    - name: http-api
+      port: 80
+      targetPort: http-api
+  type: ClusterIP
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ build.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ build.name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: {{ build.name }}
+      name: {{ build.name }}
+    spec:
+      containers:
+        - name: oauth-auth0
+          image: {{ build.images["Dockerfile"] }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-api
+              containerPort: 5000
+          terminationMessagePath: /dev/termination-log
+      restartPolicy: Always

@@ -1,0 +1,31 @@
+# --- Datawire Forge ---
+.forge
+forge.yaml
+
+# --- IntelliJ IDEA ---
+.idea
+*.iml
+
+# --- Continuous Integration ---
+ci/secrets.tar
+
+# --- K Desktop Environment ("KDE") ---
+.directory
+
+# --- macOS ---
+.DS_Store
+.LSOverride
+
+# --- Terraform ---
+.terraform
+*.tfplan
+plan.out
+terraform.tfstate*
+
+# --- Python ---
+*.pyc
+virtualenv
+venv
+*.egg-info
+.tox
+.cache

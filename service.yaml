@@ -1,0 +1,15 @@
+---
+name: ghas
+
+config:
+  cpu: 0.25
+  memory: 0.25G
+
+
+profiles:
+  dev:    { }
+  stable: { }
+
+branches:
+  master: stable
+  dev/*:  dev
