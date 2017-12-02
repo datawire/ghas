@@ -5,12 +5,23 @@ metadata:
   name: {{ build.name }}
   annotations:
     getambassador.io/config: |
+{% if build.profile.name == "stable" %}
       ---
       apiVersion: ambassador/v0
-      kind: Mapping
-      name: ghas_mapping
+      kind:  Mapping
+      name:  ghas-{{ build.profile.name }}
       prefix: /
-      service: {{ build.name }}
+      host: ghas.k736.net
+      service:  ghas-{{ build.profile.name }}.dashboard
+{% else %}
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  ghas-{{ build.profile.name }}
+      prefix: /
+      host: {{ build.profile.name }}.kubernaut.io
+      service:  ghas-{{ build.profile.name }}.dashboard
+{% endif %}
 spec:
   selector:
     app: {{ build.name }}
@@ -43,9 +54,18 @@ spec:
       name: {{ build.name }}
     spec:
       containers:
-        - name: oauth-auth0
+        - name: {{ build.name }}
           image: {{ build.images["Dockerfile"] }}
           imagePullPolicy: IfNotPresent
+          env:
+            - name: GITHUB_USER
+              value: d6e-automaton
+
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ghas
+                  key: GITHUB_TOKEN
           ports:
             - name: http-api
               containerPort: 5000

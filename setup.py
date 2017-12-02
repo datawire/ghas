@@ -8,6 +8,7 @@ setup(
     install_requires=[
         "flask==0.12.2",
         "gunicorn==19.7.1",
+        "python-dateutil==2.6.1",
         "PyGitHub==1.25.2"
     ]
 )

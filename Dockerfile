@@ -1,8 +1,8 @@
 FROM python:3.6-alpine
 MAINTAINER Datawire <dev@datawire.io>
-LABEL PROJECT_REPO_URL         = "git@github.com:datawire/argonath.git" \
-      PROJECT_REPO_BROWSER_URL = "https://github.com/datawire/argonath" \
-      DESCRIPTION              = "Datawire Oauth Auth0 Integration (Ambassador Extauth)" \
+LABEL PROJECT_REPO_URL         = "git@github.com:datawire/ghas.git" \
+      PROJECT_REPO_BROWSER_URL = "https://github.com/datawire/ghas" \
+      DESCRIPTION              = "Datawire GitHub Activity Scraper GHAS" \
       VENDOR                   = "Datawire, Inc." \
       VENDOR_URL               = "https://datawire.io"
 
@@ -26,5 +26,5 @@ ENTRYPOINT ["gunicorn", \
     "--access-logfile=-", \
     "--workers=3", \
     "--bind=0.0.0.0:5000", \
-    "oauth_auth0.app:app" \
+    "ghas.app:app" \
     ]
