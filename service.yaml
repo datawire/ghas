@@ -1,5 +1,6 @@
 ---
 name: ghas
+namespace: dashboard
 
 config:
   cpu: 0.25

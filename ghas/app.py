@@ -6,6 +6,7 @@ import dateutil.parser
 import logging
 import os
 import sys
+import threading
 import urllib.request
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -48,14 +49,13 @@ def week(date):
 
 
 def sync():
-    global issues
     issues = []
 
     for project in projects:
         repo = github.get_repo("datawire/{}".format(project))
 
         repo_issues = []
-        for issue in repo.get_issues():
+        for issue in repo.get_issues(state="all"):
             issue_dict = {
                 'repo_url': repo.url,
                 'project': repo.full_name,
@@ -67,6 +67,7 @@ def sync():
             repo_issues.append(issue_dict)
 
         issues.extend(repo_issues)
+    return issues
 
 
 def releases():
@@ -74,7 +75,7 @@ def releases():
         url = urllib.request.urlopen(changelog)
         data = url.read().decode("utf-8")
 
-        for line in data:
+        for line in data.splitlines():
             line = line.strip()
             parts = line.split()
             if project in ("telepresence", "forge") and parts and parts[0] == "####":
@@ -87,7 +88,7 @@ def query():
     created_hist = histogram()
     closed_hist = histogram()
 
-    for issue in issues:
+    for issue in issues[:]:
         if issue['pull_request']:
             continue
 
@@ -114,10 +115,20 @@ def query():
 
     return result
 
+issues = []
+
+class Syncer(threading.Thread):
+
+    def run(self):
+        global issues
+        while True:
+            issues = sync()
+            time.sleep(3600)
+
 
 @app.before_first_request
 def download_json_web_key_set():
-    sync()
+    Syncer().start()
 
 
 @app.route("/healthz", methods=["GET"])
